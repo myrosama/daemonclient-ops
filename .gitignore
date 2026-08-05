@@ -1,0 +1,32 @@
+# Secrets — never commit, not even to a private repository. A private repo is
+# access control, not encryption: every collaborator, every CI job and every
+# future fork of this clone inherits whatever is in the history.
+.env
+.env.*
+!.env.example
+service_account.json
+serviceAccount*.json
+*-service-account*.json
+*.session
+*.session-journal
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+myenv/
+build/
+dist/
+*.egg-info/
+
+# Node
+node_modules/
+npm-debug.log*
+firebase-debug.log*
+.firebase/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
