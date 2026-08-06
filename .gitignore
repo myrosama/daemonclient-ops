@@ -26,6 +26,11 @@ npm-debug.log*
 firebase-debug.log*
 .firebase/
 
+# One-off scripts written against live production data. They hardcode real user
+# uids and the Firebase web key, and none of them are part of anything that
+# runs. Kept on disk for reference, kept out of history on purpose.
+functions/one-off/
+
 # OS / editor
 .DS_Store
 .vscode/
