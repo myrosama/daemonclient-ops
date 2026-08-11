@@ -33,20 +33,32 @@ Three separate reasons, and each one on its own is sufficient:
 | `daemon-cli/` | An unreleased Python CLI (`pip install daemonclient`) for uploading and downloading from a terminal. Predates the current architecture and still hardcodes a Firebase key. Kept for reference. | not published |
 | `docs/` | Operator planning, audits and security findings. | — |
 
-## Credentials that need rotating
+## Credentials that leaked
 
 These were committed to the **public** repository and are retrievable from its
 git history. Removing the files does not unpublish them.
 
-| Credential | Where it leaked | Action |
-|---|---|---|
-| Telegram `API_ID` + `API_HASH` | `backend-server/generate_session.py` | revoke at [my.telegram.org](https://my.telegram.org) and re-issue |
-| Firebase Web API key | `daemon-cli/daemon.py`, and 5 files still in the public repo | restrict by referrer/API in Google Cloud console |
-| Cloudflare API token, R2 keys | shared in a chat transcript | rotate |
+| Credential | Where it leaked | Severity | Action |
+|---|---|---|---|
+| Telegram `API_ID` + `API_HASH` | `backend-server/generate_session.py` | moderate | nothing to revoke — see below |
+| Firebase Web API key | `daemon-cli/daemon.py`, and 5 files still in the public repo | low | restrict by referrer/API in the Google Cloud console |
+| Cloudflare API token, R2 keys | shared in a chat transcript | **high** | rotate |
 
-`generate_session.py` no longer hardcodes the Telegram credentials — it reads
-`TELEGRAM_API_ID` and `TELEGRAM_API_HASH` from the environment. The values that
-were in the file are burned regardless.
+**On the Telegram pair, precisely.** They identify an *application*, not an
+account. Nobody can sign in as you with them — that still needs a phone number
+and a login code. What they allow is a third party presenting themselves to
+Telegram as this app; abuse attributed to it can get the app restricted, which
+would break managed bot creation. Telegram offers no rotation for an
+`api_hash`, so there is no revoke button to press. Watch for the app being
+flagged, and register a fresh one on another account if it is.
+
+The credential that *is* account-level access is the Telethon **session
+string** — full control of the user account it was minted from. Those live in
+Firestore, are read at runtime, and have never been in git. That is the one to
+protect.
+
+`generate_session.py` no longer hardcodes anything; it reads `TELEGRAM_API_ID`
+and `TELEGRAM_API_HASH` from the environment.
 
 ## Running backend-server
 
